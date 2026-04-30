@@ -13,7 +13,7 @@ lake build
 Compiles in roughly 1800 jobs (most of which is Mathlib once cached). Build target `«side-interfaces»` produces a small executable; the kernel is consumed via `import Interfaces`.
 
 ```
-Build: 1824 jobs, 0 errors, 1 sorry (rank_decomposition, deferred to v0.2)
+Build: 1824 jobs, 0 errors, 1 sorry (rank_decomposition)
 Toolchain: leanprover/lean4:v4.29.0-rc8
 Mathlib: pinned via lake-manifest.json
 ```
@@ -50,8 +50,6 @@ A `ConservationProfile params` is a vector of κ values, one per parameter in a 
 
 These lift INTERFACETS Definition 7.3 (rank of an interface) and the Structure-Content Decomposition (§7.5) to the kernel level.
 
-`rank_decomposition` (the partition theorem `structuralRank + splitRank + continuousRank = dim`) is `sorry` in v0.1 — a deliberate placeholder for v0.2. The proof is mechanical: a Mathlib partition argument over `Finset.filter` with three mutually exclusive predicates.
-
 ### `Interfaces.ConnectionRequiresStructure`
 
 Two existence theorems:
@@ -80,7 +78,7 @@ Interfaces.lean                     -- root; re-exports
 └── Interfaces/ConnectionRequiresStructure.lean
                                     -- structural witness + Parametric Mechanism Theorem
 
-Kernel/InFormation.lean             -- vendored from SIDE-kernel; v0.2 will consume upstream
+Kernel/InFormation.lean             -- Formation primitive
 ```
 
 ## v0.1 inventory
@@ -88,23 +86,17 @@ Kernel/InFormation.lean             -- vendored from SIDE-kernel; v0.2 will cons
 | Item | Count |
 |:-----|:------|
 | Theorems proved | 6 |
-| Sorry | 1 (rank_decomposition, planned v0.2) |
+| Sorry | 1 (rank_decomposition) |
 | Axioms beyond Lean core | 0 |
-| Modules | 4 (3 new + 1 vendored) |
+| Modules | 4 |
 | Lines of Lean | ~470 |
 
 ## Relationship to other kernels
 
 - **SIDE-kernel** (https://github.com/psinary-sketch/SIDE-kernel) — provides Formation primitives, ξ structure, Mechanism Theorem foundations. SIDE-interfaces consumes and re-exports.
-- **SIDE-trivium** — domain kernel for the Trivium structure. v0.2 will refactor to consume Formation through SIDE-interfaces re-export rather than duplicating.
-- **SIDE-cosmo, SIDE-effects** — additional domain kernels; will adopt SIDE-interfaces vocabulary as it stabilizes.
+- **SIDE-trivium** — domain kernel for the Trivium structure.
+- **SIDE-cosmo, SIDE-effects** — additional domain kernels.
 - **PLACE-papers** (Zenodo DOI 10.5281/zenodo.19675356) — manuscript leg of the programme; INTERFACETS is one of seven Day 1 papers.
-
-## Roadmap
-
-**v0.2** discharges `rank_decomposition`, restores the `dark_iff_invariant` correspondence theorem, and refactors `Kernel/InFormation.lean` from vendored to upstream-consumed once SIDE-kernel publishes the Formation module on its public branch.
-
-**v0.3 and beyond** track INTERFACETS Part II as it develops: parametric type-level constraints, fiber structure on κ, and the Connection-Requires-Structure theorem in its sharper bimodality-derived form.
 
 ---
 

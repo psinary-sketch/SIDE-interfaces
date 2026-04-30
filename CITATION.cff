@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+title: SIDE-interfaces
+message: >-
+  If you use this software, please cite it as below.
+type: software
+authors:
+  - given-names: J.
+    family-names: York Seale
+    alias: NaturalScience
+    orcid: "https://orcid.org/0009-0008-7993-0310"
+repository-code: "https://github.com/psinary-sketch/SIDE-interfaces"
+abstract: >-
+  Lean 4 kernel for the interface vocabulary of the
+  PLACE TO STAND research programme: per-parameter
+  conservation strength kappa, conservation profiles,
+  and the existence theorems that say connection
+  requires structure.
+keywords:
+  - lean4
+  - mathlib
+  - formal-verification
+  - riemann-hypothesis
+  - SIDE-exclusion-principle
+license: MIT
+version: "0.1"
+date-released: "2026-04-30"
