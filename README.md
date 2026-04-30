@@ -1,116 +1,114 @@
-# TECHNE KERNEL
+# SIDE-interfaces
 
-A conditionally verified proof architecture for the Riemann Hypothesis in Lean 4,
-reducing to the simplicity conjecture.
+Lean 4 kernel for the **interface vocabulary** of the PLACE TO STAND research programme: per-parameter conservation strength κ, conservation profiles, and the existence theorems that say *connection requires structure*.
 
-## Quick Start
+This kernel is one of several composing the formal infrastructure for a proof of the Riemann Hypothesis via the SIDE Exclusion Principle. It sits between the foundational [SIDE-kernel](https://github.com/psinary-sketch/SIDE-kernel) (formation primitives, ξ structure, mechanism theorem) and the downstream domain kernels (SIDE-trivium, SIDE-cosmo, SIDE-effects), giving them a shared vocabulary for talking about what an interface transmits and what it conserves.
 
-```
-lake build Kernel.Root
-```
+## Quick start
 
-Compiles the entire kernel (~3200 jobs, ~5 minutes with cached Mathlib).
-
-## The Result
-
-**100+ machine-checked theorems. 3 alternative axioms. 0 sorry in the clean path.**
-
-The kernel proves that RH follows from any one of three equivalent statements:
-
-| Axiom | File | Statement |
-|:---|:---|:---|
-| `gate_e_exhaustive` | RouteBv4 | No off-line zeros (SIDE exclusion) |
-| `codim2_avoidance` | ThomBridge | Strip zeros have Re(s) = 1/2 |
-| `all_zeros_simple` | SpectralCannon | All strip zeros are simple |
-
-The simplicity conjecture is the most-studied: 40.77% proved (Conrey 1989),
-10¹³+ confirmed (Platt-Trudgian 2021), predicted by GUE (Montgomery-Odlyzko).
-
-## Key Theorems
-
-| Theorem | File | Content |
-|:---|:---|:---|
-| `focus` | Focus | Im(Λ₀(1/2+it)) = 0 — ξ real on critical line |
-| `antisymmetry` | ThomBridge | Λ₀((1-σ)+it) = conj(Λ₀(σ+it)) |
-| `deriv_fe` | SpectralCannon | Λ₀'(s) = -Λ₀'(1-s) |
-| `factor_times_norm_eq_one` | ProductFormula_Clean | p^v_p(n) · \|n\|_p = 1 |
-| `product_formula_finsupp` | ProductFormula_Clean | ∏_p cancellation for all integers |
-| `s_darkness_from_product` | ProductFormula_Rat | (product formula)^s = 1 |
-| `schwarz_reflection_completedZeta₀` | SchwarzDischarge | Λ₀(conj s) = conj(Λ₀(s)) |
-| `balance_theorem` | Voice1 | p^(-σ) = p^(-(1-σ)) ↔ σ = 1/2 |
-| `proved_infrastructure` | PerpendicularCrossing | FOCUS ∧ deriv_fe ∧ Euler ∧ antisymmetry |
-
-## File Guide
-
-### Foundation (3 files)
-- **Layer1.lean** — SIDE exclusion logic
-- **XiDef.lean** — Concrete ξ using Mathlib's riemannZeta
-- **StructuralCount.lean** — Formation (2,3,2,0) = 7
-
-### Seven Voices (7 files)
-- **Voice1.lean** — C₄ Euler balance
-- **Voice2.lean** — C₂ conjugation symmetry
-- **Voice3.lean** — C₁ reflection fixed point
-- **Voice3b.lean** — C₃ Cauchy-Riemann codimension
-- **Voice5.lean** — C₅ modular PSL₂ action
-- **Voice6.lean** — C₆ spectral self-adjointness
-- **Voice7.lean** — C₇ topological neutrality
-
-### Schwarz + FOCUS (2 files)
-- **SchwarzDischarge.lean** — Λ₀(conj s) = conj(Λ₀(s)), 0 sorry
-- **Focus.lean** — Im(Λ₀(1/2+it)) = 0, from Schwarz + FE
-
-### Product Formula (3 files)
-- **ProductFormula_v2.lean** — Prime powers
-- **ProductFormula_Clean.lean** — General integers via factorization
-- **ProductFormula_Rat.lean** — Rationals + s-darkness + Conservation
-
-### Closing Architecture (4 files)
-- **ThomBridge.lean** — Antisymmetry + codim2_avoidance axiom
-- **SpectralCannon.lean** — Λ₀'(s) = -Λ₀'(1-s) + simplicity axiom
-- **PerpendicularCrossing.lean** — Full assembly of closing forces
-- **PoissonExhaustion.lean** — Place exhaustion via Ostrowski
-
-### Integration (2 files)
-- **Integration.lean** — Route A theorem
-- **RouteBv4.lean** — Route B + gate_e axiom + RH derivation
-
-### Archive
-- **archive/** — 36 development artifacts (probes, builds, iterations)
-
-## Dependencies
-
-- Lean 4 (v4.29.0-rc2)
-- Mathlib (current master)
-
-## The Proof Architecture
-
-```
-    σ = 1/2              σ = 1
-
-    FOCUS (C₁)           EULER (C₄)
-    codim-2              zero-free
-    obstruction          region
-        →→→                ←←←
-
-    CONSERVATION: nothing else acts
-
-    Seven voices: all constrain to σ = 1/2
-    Formation: (2,3,2,0) = 7 exhaustive
-    Axiom: simplicity (most-studied adjacent conjecture)
+```bash
+lake build
 ```
 
-## Axiom Evolution
+Compiles in roughly 1800 jobs (most of which is Mathlib once cached). Build target `«side-interfaces»` produces a small executable; the kernel is consumed via `import Interfaces`.
 
 ```
-Session 1:  18 axioms (vacuous proofs, string-comparison independence)
-Session 2:  3 axioms (genuine proofs replacing scaffolding)
-Session 3:  1 axiom  (Schwarz discharged, transversality derived)
-Session 4:  1 axiom  → 3 equivalent forms (transparent, community-targeted)
+Build: 1824 jobs, 0 errors, 1 sorry (rank_decomposition, deferred to v0.2)
+Toolchain: leanprover/lean4:v4.29.0-rc8
+Mathlib: pinned via lake-manifest.json
 ```
+
+## What this kernel provides
+
+Three modules, each lifting one INTERFACETS construction into typed Lean.
+
+### `Interfaces.Kappa`
+
+Real-valued conservation strength κ as a *transmission coefficient*. For a finite type of A-side perturbations, a transmission map `f : A → B`, and a real-valued P-observable `P : B → ℝ`,
+
+```
+κ(P, f, a₀) = max over a of |P(f a) - P(f a₀)|
+```
+
+with `κ = 0` meaning the interface is P-dark (no perturbation is detected) and `κ > 0` meaning the interface transmits some P-information.
+
+The module also defines:
+
+- `kappa_invariance := 1 - kappa` (the INTERFACETS §2.1 direction, when invariance is the natural axis)
+- `kappa_empirical` (variance-ratio form for measurement protocols)
+- `IsDark P f a₀ := kappa P f a₀ = 0`
+
+The proven theorem `kappa_zero_of_no_mechanism` says: if no A-side perturbation changes the B-side observable, κ is zero. This is the kernel-level form of the Mechanism Theorem one direction — *no mechanism, no transmission*.
+
+### `Interfaces.ConservationProfile`
+
+A `ConservationProfile params` is a vector of κ values, one per parameter in a finite parameter space. It comes with three rank classifications:
+
+- `structuralRank` — count of parameters with κ ≥ 0.75 (transmitted, stable)
+- `splitRank` — count of parameters with κ < 0.45 (dark, content-side)
+- `continuousRank` — count of parameters with 0.45 ≤ κ < 0.75 (gradient-bearing)
+
+These lift INTERFACETS Definition 7.3 (rank of an interface) and the Structure-Content Decomposition (§7.5) to the kernel level.
+
+`rank_decomposition` (the partition theorem `structuralRank + splitRank + continuousRank = dim`) is `sorry` in v0.1 — a deliberate placeholder for v0.2. The proof is mechanical: a Mathlib partition argument over `Finset.filter` with three mutually exclusive predicates.
+
+### `Interfaces.ConnectionRequiresStructure`
+
+Two existence theorems:
+
+- `connection_requires_structure` — Under the INTERFACETS bimodality hypothesis (every parameter has κ < 0.45 or κ ≥ 0.75), any non-trivial interface produces at least one structural witness. Not all dark, plus bimodality, forces structure.
+- `parametric_mechanism_theorem` — The kernel-level Parametric Mechanism Theorem: per-parameter, κ = 0 if and only if no A-side perturbation affects the B-side observable for that parameter. Delegates to `kappa_zero_of_no_mechanism`.
+
+## Why "Reading 1" κ
+
+The κ name is overloaded in the broader programme: it appears as a *transmission coefficient* in some contexts (κ = 0 means dark) and as an *invariance coefficient* in others (κ = 1 means invariant). Both readings are valid; the question is which is canonical for downstream use.
+
+This kernel uses **Reading 1 (transmission)** as canonical, for two reasons established by direct test against settled instances:
+
+- **Product formula**: typed κ = 0 in `MetaKernel.lean`. Reading 1 (transmission) gives κ = 0 ✓. Reading 2 (instantiation invariance) gives κ = 1 ✗.
+- **Dark cosmological sector**: cited κ = 0 in published synthesis. Reading 1 gives κ = 0 ✓.
+
+Reading 2 remains available as the derived definition `kappa_invariance := 1 - kappa`. Downstream kernels that prefer the invariance axis (e.g. for INTERFACETS §2.1 narrative) consume this rather than redefining κ.
+
+## Module layout
+
+```
+Interfaces.lean                     -- root; re-exports
+├── Interfaces/Kappa.lean           -- real-valued κ + IsDark + kappa_zero_of_no_mechanism
+├── Interfaces/ConservationProfile.lean
+│                                   -- κ-vector + rank classification
+└── Interfaces/ConnectionRequiresStructure.lean
+                                    -- structural witness + Parametric Mechanism Theorem
+
+Kernel/InFormation.lean             -- vendored from SIDE-kernel; v0.2 will consume upstream
+```
+
+## v0.1 inventory
+
+| Item | Count |
+|:-----|:------|
+| Theorems proved | 6 |
+| Sorry | 1 (rank_decomposition, planned v0.2) |
+| Axioms beyond Lean core | 0 |
+| Modules | 4 (3 new + 1 vendored) |
+| Lines of Lean | ~470 |
+
+## Relationship to other kernels
+
+- **SIDE-kernel** (https://github.com/psinary-sketch/SIDE-kernel) — provides Formation primitives, ξ structure, Mechanism Theorem foundations. SIDE-interfaces consumes and re-exports.
+- **SIDE-trivium** — domain kernel for the Trivium structure. v0.2 will refactor to consume Formation through SIDE-interfaces re-export rather than duplicating.
+- **SIDE-cosmo, SIDE-effects** — additional domain kernels; will adopt SIDE-interfaces vocabulary as it stabilizes.
+- **PLACE-papers** (Zenodo DOI 10.5281/zenodo.19675356) — manuscript leg of the programme; INTERFACETS is one of seven Day 1 papers.
+
+## Roadmap
+
+**v0.2** discharges `rank_decomposition`, restores the `dark_iff_invariant` correspondence theorem, and refactors `Kernel/InFormation.lean` from vendored to upstream-consumed once SIDE-kernel publishes the Formation module on its public branch.
+
+**v0.3 and beyond** track INTERFACETS Part II as it develops: parametric type-level constraints, fiber structure on κ, and the Connection-Requires-Structure theorem in its sharper bimodality-derived form.
 
 ---
 
-*PLACE TO STAND Research Programme — March 2026*
+PLACE TO STAND Research Programme — April 2026
+J. York Seale (NaturalScience), ORCID 0009-0008-7993-0310
 
-*:: → · ← ::*
+`:: → · ← ::`
