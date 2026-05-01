@@ -30,8 +30,18 @@ jobs:
         run: |
           lake exe cache get || true
 
-      - name: Build
-        run: lake build
+      - name: Build (capturing output)
+        run: |
+          set -o pipefail
+          lake build 2>&1 | tee build.log
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ github.sha }}
+          path: build.log
+          retention-days: 90
 
   audit:
     runs-on: ubuntu-latest
@@ -40,27 +50,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Count sorrys (excluding comments)
+      - name: Download build log
+        uses: actions/download-artifact@v4
+        with:
+          name: build-log-${{ github.sha }}
+
+      - name: Count real sorrys (from Lean warnings)
         id: sorry_count
         run: |
-          # Count `sorry` only in code positions, not in -- or /- comments.
-          # Heuristic: lines that contain `sorry` but are not pure comment lines.
-          SORRY_COUNT=$(grep -rn "sorry" --include="*.lean" \
-                        --exclude-dir=".lake" --exclude-dir="archive" . \
-                        | grep -v "^\s*--" \
-                        | grep -v "^\s*/-" \
-                        | wc -l)
-          echo "count=$SORRY_COUNT" >> $GITHUB_OUTPUT
-          echo "Sorry count: $SORRY_COUNT"
+          # Lean emits: warning: <file>:<line>:<col>: declaration uses `sorry`
+          # The word "sorry" is wrapped in BACKTICKS in Lean's output, not single quotes.
+          # `grep -c` returns 1 (not 0) when no matches found, so we use a safer pattern.
+          SORRY_COUNT=$(grep -c 'declaration uses .sorry.' build.log) || SORRY_COUNT=0
+          echo "count=${SORRY_COUNT}" >> $GITHUB_OUTPUT
+          echo "Real sorry count (from Lean warnings): ${SORRY_COUNT}"
 
-      - name: List sorry locations
+      - name: List sorry warnings (with locations)
         run: |
-          echo "=== Sorry locations ==="
-          grep -rn "sorry" --include="*.lean" \
-               --exclude-dir=".lake" --exclude-dir="archive" . \
-               | grep -v "^\s*--" \
-               | grep -v "^\s*/-" \
-               || echo "(none)"
+          echo "=== Sorry warnings from Lean build ==="
+          grep 'declaration uses .sorry.' build.log || echo "(none)"
 
       - name: Count axioms (declarations beyond Lean core)
         id: axiom_count
@@ -68,8 +76,8 @@ jobs:
           AXIOM_COUNT=$(grep -rn "^axiom " --include="*.lean" \
                         --exclude-dir=".lake" --exclude-dir="archive" . \
                         | wc -l)
-          echo "count=$AXIOM_COUNT" >> $GITHUB_OUTPUT
-          echo "Axiom count: $AXIOM_COUNT"
+          echo "count=${AXIOM_COUNT}" >> $GITHUB_OUTPUT
+          echo "Axiom count: ${AXIOM_COUNT}"
 
       - name: List axiom locations
         run: |
@@ -89,7 +97,9 @@ jobs:
             "run_id": "${{ github.run_id }}",
             "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "sorry_count": ${{ steps.sorry_count.outputs.count }},
-            "axiom_count": ${{ steps.axiom_count.outputs.count }}
+            "axiom_count": ${{ steps.axiom_count.outputs.count }},
+            "sorry_count_method": "lean-warning-grep",
+            "axiom_count_method": "source-line-grep"
           }
           JSON
           cat audit.json
