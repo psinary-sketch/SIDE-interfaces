@@ -4,7 +4,7 @@
 **Programme:** PLACE TO STAND Research Programme
 **Author:** J. York Seale (ORCID: [0009-0008-7993-0310](https://orcid.org/0009-0008-7993-0310))
 **License:** MIT
-**Current version:** v0.1.3 (tag `v0.1.3`, commit `7c917a6`)
+**Current version:** v0.2 (tag `v0.2`)
 
 This file orients LLM agents and automated tooling to the repository's purpose, structure, and verification surface. Human readers should start with `README.md`.
 
@@ -25,7 +25,7 @@ Member of the **PLACE TO STAND federation of kernels**. Independent: own toolcha
 ## Cite as
 
 ```
-Seale, J. York. (2026). SIDE-interfaces v0.1.3: Lean 4 kernel for the
+Seale, J. York. (2026). SIDE-interfaces v0.2: Lean 4 kernel for the
 interface vocabulary of the SIDE framework. Zenodo.
 [DOI to be confirmed; companion kernels deposited May 2026]
 ```
@@ -47,7 +47,7 @@ CI at `.github/workflows/audit.yml` runs `lake build` (1824 jobs at last verific
 
 ---
 
-## Theorems exported (v0.1.3)
+## Theorems exported (v0.2)
 
 The interface vocabulary kernel provides:
 
@@ -55,6 +55,7 @@ The interface vocabulary kernel provides:
 - **`ConservationProfile`** — per-parameter κ vector P(I)
 - **`SplitRank`** — dimension of content subspace at interface I
 - **`rank_decomposition`** — closed at v0.1.3 via `Finset.card_filter_add_card_filter_not` plus structural case analysis (commit `812fa00`)
+- **`interface_split`** — added in v0.2 via `Finset.card_lt_card`; `¬ IsAllStructural P` implies `structuralRank P < dim P` (structural form of Proposition 1 per INTERFACE_CONSERVATION_HODGE_AND_INTERFACETS §III.5 / INTERFACETS_REFINED §4; LV-L-1a)
 - **Parametric Mechanism Theorem** — no mechanism for θ implies no effect on θ; generalizes the single-parameter Mechanism Theorem from SIDE-kernel
 - **Crystallization-type classification** — G (gradual), F (fast), N (never)
 - **Connection Requires Structure theorem** — rank < d for any composed system
@@ -66,8 +67,9 @@ The kernel formalizes the structural skeleton; empirical findings (34 of 34 pred
 - **v0.1.1** (commit `4bcae3c`): rich content, 1 open sorry on `rank_decomposition`
 - **v0.1.2** (commit `9e34d61`): wrong README installed due to MY-Downloads sort-order pickup — file-replacement discipline failure documented
 - **v0.1.3** (commit `7c917a6`): recovered via base64-encoded PowerShell script; corrected README with rank_decomposition closure note and all companion kernel Zenodo DOIs; canonical zero-sorry state
+- **v0.2** (this commit): add `interface_split` theorem (Proposition 1 structural form, LV-L-1a) and its docstring in `Interfaces/ConservationProfile.lean`; +40 lines; build 1824 jobs / 0 errors / 0 sorry / 0 axioms preserved
 
-The tag history is preserved honestly (v0.1.2 visible failure, v0.1.3 canonical recovery) rather than rewritten.
+The tag history is preserved honestly (v0.1.2 visible failure, v0.1.3 canonical recovery, v0.2 substantive theorem addition) rather than rewritten.
 
 ---
 
@@ -127,7 +129,7 @@ CONVERGENCE / INTERFACETS equivalence table (manuscript-side):
 
 ## Honest open status
 
-- All v0.1.3 theorems compile zero-sorry.
+- All v0.2 theorems compile zero-sorry.
 - INTERFACETS manuscript Q1–Q5 open research questions (the bimodality boundary; whether rank ≥ 3 exists; what determines crystallization type; whether the Connection Requires Structure bound is optimal; whether κ(θ) is predictable from system specification) are *research questions*, not kernel-side gaps.
 - Manuscript-side empirical claims (κ measured across systems) are empirical content, not kernel theorems.
 

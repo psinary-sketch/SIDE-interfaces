@@ -82,6 +82,46 @@ def IsAllDark (P : ConservationProfile params) : Prop :=
 def IsAllStructural (P : ConservationProfile params) : Prop :=
   ∀ x, (75 : Real) / 100 <= P.kvec x
 
+/--
+**Interface Split** (structural form).
+
+Kernel-vocabulary statement of Proposition 1 from
+`INTERFACE_CONSERVATION_HODGE_AND_INTERFACETS` §III.5 and `INTERFACETS_REFINED` §4:
+for any conservation profile `P` that is not fully structural (some parameter
+has `kvec < 0.75`), the structural rank is strictly less than the total
+parameter count.
+
+**Translation note.** The source statement reads: *"For any non-trivial
+interface f: A → B with d observable parameters, at least one parameter is
+non-conservative. Equivalently, rank(I) < d."* The translation:
+
+- Source hypothesis "f non-injective" → kernel hypothesis `¬ IsAllStructural P`,
+  via the bimodality observation (real-world non-injective interfaces produce
+  profiles where some parameter has κ ≈ 0; see INTERFACETS_REFINED §3).
+- Source conclusion "rank(I) < d" → kernel conclusion `structuralRank P < dim P`,
+  preserved verbatim.
+
+The full source-fidelity form with explicit `f : A → B` and parameter family
+`θ : params → A → ℝ` is reserved for a future `SIDE-interface-split` kernel
+(LV-L-1b in the verifications TODO).
+-/
+theorem interface_split
+    {params : Type} [Fintype params]
+    (P : ConservationProfile params)
+    (h_nontrivial : ¬ IsAllStructural P) :
+    structuralRank P < dim P := by
+  classical
+  unfold IsAllStructural at h_nontrivial
+  push_neg at h_nontrivial
+  obtain ⟨x, hx⟩ := h_nontrivial
+  unfold structuralRank dim structuralSet
+  apply Finset.card_lt_card
+  refine ⟨Finset.filter_subset _ _, ?_⟩
+  intro h_supset
+  have hx_in := h_supset (Finset.mem_univ x)
+  rw [Finset.mem_filter] at hx_in
+  exact absurd hx_in.2 (not_le.mpr hx)
+
 end ConservationProfile
 
 end Interfaces

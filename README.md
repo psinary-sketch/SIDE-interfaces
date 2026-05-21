@@ -83,15 +83,15 @@ Interfaces.lean                     -- root; re-exports
 Kernel/InFormation.lean             -- Formation primitive
 ```
 
-## v0.1.3 inventory
+## v0.2 inventory
 
 | Item | Count |
 |:-----|:------|
-| Theorems proved | 7 |
+| Theorems proved | 8 |
 | Sorry | 0 |
 | Axioms beyond Lean core | 0 |
 | Modules | 4 |
-| Lines of Lean | ~470 |
+| Lines of Lean | ~510 |
 
 ## Relationship to other kernels
 
