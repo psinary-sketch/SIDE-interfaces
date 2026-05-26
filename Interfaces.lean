@@ -24,3 +24,4 @@ import Kernel.InFormation
 import Interfaces.Kappa
 import Interfaces.ConservationProfile
 import Interfaces.ConnectionRequiresStructure
+import Interfaces.InterfaceSplit
