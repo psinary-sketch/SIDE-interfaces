@@ -1,0 +1,11 @@
+Interfaces.kappa_zero_of_no_mechanism
+Interfaces.ConservationProfile.rank_decomposition
+Interfaces.ConservationProfile.interface_split
+Interfaces.connection_requires_structure
+Interfaces.parametric_mechanism_theorem
+Interfaces.interface_has_nonconservative_parameter
+Interfaces.interface_split_faithful
+Kernel.information_is_in_formation
+Kernel.xi_determined
+Kernel.xi_information_in_formation
+Kernel.xi_structural_seven
