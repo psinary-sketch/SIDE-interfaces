@@ -1,8 +1,12 @@
 # SIDE-interfaces
 
-Lean 4 kernel for the **interface vocabulary** of the PLACE TO STAND research programme: per-parameter conservation strength κ, conservation profiles, and the existence theorems that say *connection requires structure*.
+SIDE-interfaces compiles a ConservationProfile structure over a finite parameter type, and three statements. Statements at 1728796:
 
-This kernel is one of several composing the formal infrastructure for a proof of the Riemann Hypothesis via the SIDE Exclusion Principle. It sits between the foundational [SIDE-kernel](https://github.com/psinary-sketch/SIDE-kernel) (formation primitives, ξ structure, mechanism theorem) and the downstream domain kernels (SIDE-trivium, SIDE-cosmo, SIDE-effects), giving them a shared vocabulary for talking about what an interface transmits and what it conserves.
+    theorem connection_requires_structure {params : Type} [Fintype params] (P : ConservationProfile params) (h_nontrivial : NontrivialInterface P) (h_bimodality : ∀ x, P.kvec x < (45 : Real) / 100 ∨ (75 : Real) / 100 <= P.kvec x) : ∃ x : params, StructuralWitness P x (Interfaces/ConnectionRequiresStructure.lean :22)
+    theorem parametric_mechanism_theorem {A B : Type} [Fintype A] (P : B -> Real) (f : A -> B) (a0 : A) (h_no_mechanism : ∀ a : A, P (f a) = P (f a0)) : kappa P f a0 = 0 (Interfaces/ConnectionRequiresStructure.lean :41)
+    theorem rank_decomposition (P : ConservationProfile params) : structuralRank P + splitRank P + continuousRank P = dim P (Interfaces/ConservationProfile.lean :38)
+
+connection_requires_structure concludes one witness and only under its bimodality premise, and it alone concludes an existential. The profile's field kvec is tied by no statement to a measured conservation strength.
 
 ## Quick start
 
@@ -30,8 +34,6 @@ Real-valued conservation strength κ as a *transmission coefficient*. For a fini
 κ(P, f, a₀) = max over a of |P(f a) - P(f a₀)|
 ```
 
-with `κ = 0` meaning the interface is P-dark (no perturbation is detected) and `κ > 0` meaning the interface transmits some P-information.
-
 The module also defines:
 
 - `kappa_invariance := 1 - kappa` (the INTERFACETS §2.1 direction, when invariance is the natural axis)
@@ -40,33 +42,13 @@ The module also defines:
 
 The proven theorem `kappa_zero_of_no_mechanism` says: if no A-side perturbation changes the B-side observable, κ is zero. This is the kernel-level form of the Mechanism Theorem one direction — *no mechanism, no transmission*.
 
-### `Interfaces.ConservationProfile`
-
-A `ConservationProfile params` is a vector of κ values, one per parameter in a finite parameter space. It comes with three rank classifications:
-
-- `structuralRank` — count of parameters with κ ≥ 0.75 (transmitted, stable)
-- `splitRank` — count of parameters with κ < 0.45 (dark, content-side)
-- `continuousRank` — count of parameters with 0.45 ≤ κ < 0.75 (gradient-bearing)
-
-These lift INTERFACETS Definition 7.3 (rank of an interface) and the Structure-Content Decomposition (§7.5) to the kernel level.
-
-The threshold partition cardinality theorem `rank_decomposition` (proved at v0.1.3) establishes that these three ranks sum to the total parameter count — the three threshold-defined subsets partition `Finset.univ`.
-
 ### `Interfaces.ConnectionRequiresStructure`
 
-Two existence theorems:
-
 - `connection_requires_structure` — Under the INTERFACETS bimodality hypothesis (every parameter has κ < 0.45 or κ ≥ 0.75), any non-trivial interface produces at least one structural witness. Not all dark, plus bimodality, forces structure.
-- `parametric_mechanism_theorem` — The kernel-level Parametric Mechanism Theorem: per-parameter, κ = 0 if and only if no A-side perturbation affects the B-side observable for that parameter. Delegates to `kappa_zero_of_no_mechanism`.
 
 ## Why "Reading 1" κ
 
 The κ name is overloaded in the broader programme: it appears as a *transmission coefficient* in some contexts (κ = 0 means dark) and as an *invariance coefficient* in others (κ = 1 means invariant). Both readings are valid; the question is which is canonical for downstream use.
-
-This kernel uses **Reading 1 (transmission)** as canonical, for two reasons established by direct test against settled instances:
-
-- **Product formula**: typed κ = 0 in `MetaKernel.lean`. Reading 1 (transmission) gives κ = 0 (correct). Reading 2 (instantiation invariance) gives κ = 1 (incorrect).
-- **Dark cosmological sector**: cited κ = 0 in published synthesis. Reading 1 gives κ = 0 (correct).
 
 Reading 2 remains available as the derived definition `kappa_invariance := 1 - kappa`. Downstream kernels that prefer the invariance axis (e.g. for INTERFACETS §2.1 narrative) consume this rather than redefining κ.
 
@@ -91,11 +73,10 @@ Kernel/InFormation.lean             -- Formation primitive
 | Sorry | 0 |
 | Axioms beyond Lean core | 0 |
 | Modules | 4 |
-| Lines of Lean | ~510 |
 
 ## Relationship to other kernels
 
-- **SIDE-kernel** (https://github.com/psinary-sketch/SIDE-kernel) — provides Formation primitives, ξ structure, Mechanism Theorem foundations. SIDE-interfaces consumes and re-exports. Zenodo DOI 10.5281/zenodo.19674313.
+- **SIDE-kernel** (https://github.com/psinary-sketch/SIDE-kernel) — provides Formation primitives, ξ structure, Mechanism Theorem foundations. Zenodo DOI 10.5281/zenodo.19674313.
 - **SIDE-trivium** (https://github.com/psinary-sketch/SIDE-trivium) — domain kernel for the Trivium structure. Zenodo DOI 10.5281/zenodo.19938003.
 - **SIDE-cosmo** (https://github.com/psinary-sketch/SIDE-cosmo) — cosmological extension kernel; formation distance Δμ as dark sector, Ω_b prediction. Zenodo DOI 10.5281/zenodo.19938009.
 - **SIDE-effects** (https://github.com/psinary-sketch/SIDE-effects) — additional domain kernel; framework consequences (Yang-Mills, GRH, BSD, Artin, additive-multiplicative problems).
